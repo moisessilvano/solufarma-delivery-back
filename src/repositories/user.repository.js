@@ -3,10 +3,16 @@
 const mongoose = require('mongoose');
 const Model = mongoose.model('User');
 
-exports.get = async (limit, skip) => {
+exports.auth = async (username, password) => {
+    const res = await Model.findOne({
+        username, password
+    }, 'name username createAt updateAt');
+    return res;
+}
+
+exports.get = async () => {
     const res = await Model.find({
-        status: true
-    }, 'name username createAt updateAt', { limit: limit, skip: skip });
+    }, 'name username createAt updateAt');
     return res;
 }
 
