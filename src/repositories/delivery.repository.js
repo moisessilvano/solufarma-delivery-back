@@ -5,12 +5,23 @@ const Model = mongoose.model('Delivery');
 
 exports.get = async () => {
     const res = await Model.find({},
-        'orderCode date customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt');
+        'orderCode date fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+        .populate('deliveredUser', 'name username')
     return res;
 }
 
 exports.getById = async (id) => {
-    const res = await Model.findById(id, 'orderCode date customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt');
+    const res = await Model.findById(id, 'orderCode date fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+        .populate('deliveredUser', 'name username');
+    return res;
+}
+
+exports.getByOrder = async orderCode => {
+    const res = await Model.find({
+        orderCode
+    },
+        'orderCode date fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+        .populate('deliveredUser', 'name username');
     return res;
 }
 

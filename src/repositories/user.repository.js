@@ -6,7 +6,7 @@ const Model = mongoose.model('User');
 exports.auth = async (username, password) => {
     const res = await Model.findOne({
         username, password
-    }, 'name username createAt updateAt');
+    }, 'name username type createAt updateAt');
     return res;
 }
 

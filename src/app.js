@@ -17,6 +17,13 @@ mongoose.connect(config.connectionString, {
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', true);
 
+app.use(bodyParser.json({
+    limit: '5mb'
+}));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+
 // Carrega os Models
 require('./models/user');
 require('./models/delivery');
@@ -32,12 +39,6 @@ app.use('/api/deliveries', deliveryRoute);
 app.use('/api/process', processRoute);
 app.use('/api/users', userRoute);
 
-app.use(bodyParser.json({
-    limit: '5mb'
-}));
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
 
 // Habilita o CORS
 app.use(function (req, res, next) {

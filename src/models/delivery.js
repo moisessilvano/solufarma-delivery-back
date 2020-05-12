@@ -15,6 +15,10 @@ const schema = new Schema({
     customerCode: {
         type: String
     },
+    fullAddress: {
+        type: String,
+        required: true,
+    },
     customerName: {
         type: String,
         required: true,
