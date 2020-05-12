@@ -1,0 +1,20 @@
+{
+  "name": "solufarma-delivery-back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./bin/server.js",
+    "start:dev": "nodemon ./bin/server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "md5": "^2.2.1",
+    "moment": "^2.25.3",
+    "mongoose": "^5.9.13"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
