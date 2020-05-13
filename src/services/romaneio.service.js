@@ -1,27 +1,45 @@
 'use strict';
 
 exports.getDeliveryInfoFromRomaneio = romaneio => {
+  if (!romaneio) return null;
+
   const newRomaneio = romaneio.replace(/\s{2,}/g, ' ');
   const romaneioSplit = newRomaneio.split(' - ');
 
-  let orderNumber, fullAddress, clienteName, clientCode, deliveryDate;
+  let orderCode, fullAddress, customerName, customerCode, deliveryDate;
 
-  const treatment1 = romaneioSplit[0];
+  let treatmentCount = 0;
+
+  const treatment1 = romaneioSplit[treatmentCount];
   if (treatment1) {
     var value = treatment1.replace('ROMANEIO:', '').trim();
-    clientCode = value.substring(value.indexOf(' ') + 0).trim();
-    orderNumber = value.replace(clientCode, '').trim();
+    const valueSplit = value.split(' ');
+    orderCode = valueSplit[0];
+    customerCode = valueSplit[1];
+
+    if (isNaN(customerCode)) {
+      treatmentCount++;
+      customerCode = romaneioSplit[treatmentCount];
+    }
   }
 
-  const treatment2 = romaneioSplit[1];
+  treatmentCount++;
+
+  const treatment2 = romaneioSplit[treatmentCount];
   if (treatment2) {
-    clienteName = treatment2.trim();
+    customerName = treatment2.trim();
   }
 
-  const treatment3 = romaneioSplit[2];
+  treatmentCount++;
+
+  let treatment3 = romaneioSplit[treatmentCount];
   if (treatment3) {
-    const treatment3Split = treatment3.split('PRIORIDADE:');
-    fullAddress = treatment3Split[0];
+    const treatment3Split = newRomaneio.split('PRIORIDADE:');
+
+    let treatmentAddress = treatment3Split[0];
+    if (treatmentAddress) {
+      fullAddress = treatmentAddress.replace(treatment1, '').replace(treatment2, '').replace('-', '').replace('-', '').trim();
+    }
 
     const text = treatment3Split[1];
 
@@ -33,20 +51,18 @@ exports.getDeliveryInfoFromRomaneio = romaneio => {
         deliveryDate = new Date(newDate);
       }
     }
+
   }
 
   // VERIFICA SE É UMA ENTREGA
-  if (isNaN(orderNumber) || !orderNumber || !fullAddress || !clientCode || !clienteName) {
-    // console.log(romaneio);
-    // console.log('------------------------------------------');
-
+  if (isNaN(orderCode) || !orderCode || !fullAddress || !customerCode || !customerName) {
     return null;
   } else {
     return {
-      orderNumber,
+      orderCode,
       fullAddress,
-      clientCode,
-      clienteName,
+      customerCode,
+      customerName,
       deliveryDate
     }
   }
@@ -57,14 +73,16 @@ exports.getDeliveriesFromData = txtContent => {
 
   const fullRomaneioSplit = txtContent.split('�����������������������������������������������������������������������������������������������������������������������������������������');
 
-  console.log(fullRomaneioSplit.length)
-
   fullRomaneioSplit.map((romaneio, index) => {
     const result = this.getDeliveryInfoFromRomaneio(romaneio);
     if (result) {
       deliveryList.push(result);
     }
   });
+
+  // const result = this.getDeliveryInfoFromRomaneio(fullRomaneioSplit[2]);
+  // console.log(result);
+  // deliveryList.push(result);
 
   return deliveryList;
 };

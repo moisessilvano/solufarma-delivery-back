@@ -7,7 +7,12 @@ const authService = require('../services/auth.service');
 
 exports.get = async (req, res, next) => {
     try {
-        var data = await repository.get();
+        let limit = parseInt(req.query.limit);
+        if (limit === 0) { limit = 30; }
+        let skip = parseInt(req.query.skip);
+        if (skip === 0) { limit = 0; }
+
+        var data = await repository.get(limit, skip);
         res.status(200).send(data);
     } catch (e) {
         res.status(500).send({
@@ -21,6 +26,19 @@ exports.getByOrder = async (req, res, next) => {
     try {
         const { order } = req.params;
         var data = await repository.getByOrder(order);
+        res.status(200).send(data);
+    } catch (e) {
+        res.status(500).send({
+            message: errorEnum.REQUEST_ERROR,
+            error: e
+        });
+    }
+};
+
+exports.getByDate = async (req, res, next) => {
+    try {
+        const { date } = req.params;
+        var data = await repository.getByDate(date);
         res.status(200).send(data);
     } catch (e) {
         res.status(500).send({
@@ -77,19 +95,22 @@ exports.completeDelivery = async (req, res, next) => {
 
         const delivery = await repository.getById(id);
 
-        if (delivery && delivery.deliveredUser) {
-            return res.status(400).send({
-                message: 'Essa entrega já foi efetuada por ' + delivery.deliveredUser.name
-            })
-        }
+        // if (delivery && delivery.deliveredUser) {
+        //     return res.status(400).send({
+        //         message: 'Essa entrega já foi efetuada por ' + delivery.deliveredUser.name
+        //     })
+        // }
 
-        const climateInfo = climareService.getInfo();
-        await repository.update(id, {
-            ...climateInfo,
-            deliveredUser: dataToken._id,
-            deliveredIn: new Date()
-        });
-        res.status(201).send(climateInfo);
+        const climateInfo = await climareService.getInfo();
+
+        console.log('climateInfo', climateInfo)
+
+        // await repository.update(id, {
+        //     ...climateInfo,
+        //     deliveredUser: dataToken._id,
+        //     deliveredIn: new Date()
+        // });
+        // res.status(201).send(climateInfo);
     } catch (e) {
         res.status(500).send({
             message: errorEnum.REQUEST_ERROR,

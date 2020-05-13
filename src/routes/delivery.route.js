@@ -8,6 +8,7 @@ const authService = require('../services/auth.service');
 router.get('/', authService.authorize, controller.get);
 router.get('/:id', authService.authorize, controller.getById);
 router.get('/getByOrder/:order', authService.authorize, controller.getByOrder);
+router.get('/getByDate/:date', authService.authorize, controller.getByDate);
 router.post('/', authService.authorize, controller.create);
 router.put('/:id', authService.authorize, controller.update);
 router.put('/completeDelivery/:id', authService.authorize, controller.completeDelivery);

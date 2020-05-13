@@ -8,7 +8,7 @@ const schema = new Schema({
         type: String,
         required: true
     },
-    date: {
+    deliveryDate: {
         type: Date,
         required: true
     },
