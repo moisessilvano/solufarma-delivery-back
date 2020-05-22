@@ -12,12 +12,12 @@ exports.auth = async (username, password) => {
 
 exports.get = async () => {
     const res = await Model.find({
-    }, 'name username createAt updateAt');
+    }, 'name username type createAt updateAt');
     return res;
 }
 
 exports.getById = async (id) => {
-    const res = await Model.findById(id, 'name username createAt updateAt');
+    const res = await Model.findById(id, 'name username type createAt updateAt');
     return res;
 }
 

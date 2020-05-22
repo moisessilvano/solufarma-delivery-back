@@ -1,12 +1,16 @@
 'use strict';
+const moment = require('moment-timezone');
+// moment.tz.setDefault("America/brasilia");
 
 exports.getDeliveryInfoFromRomaneio = romaneio => {
   if (!romaneio) return null;
 
+  // console.log('romaneio', romaneio)
+
   const newRomaneio = romaneio.replace(/\s{2,}/g, ' ');
   const romaneioSplit = newRomaneio.split(' - ');
 
-  let orderCode, fullAddress, customerName, customerCode, deliveryDate;
+  let orderCode, requestCode, fullAddress, customerName, customerCode, deliveryDate;
 
   let treatmentCount = 0;
 
@@ -33,6 +37,7 @@ exports.getDeliveryInfoFromRomaneio = romaneio => {
   treatmentCount++;
 
   let treatment3 = romaneioSplit[treatmentCount];
+
   if (treatment3) {
     const treatment3Split = newRomaneio.split('PRIORIDADE:');
 
@@ -48,7 +53,16 @@ exports.getDeliveryInfoFromRomaneio = romaneio => {
       if (dates && dates[0]) {
         const date = dates[0].split('/');
         const newDate = '20' + date[2] + '-' + date[1] + '-' + date[0];
-        deliveryDate = new Date(newDate);
+        deliveryDate = moment(newDate).toISOString();
+      }
+    }
+
+    const requestTreatment3Split = newRomaneio.split('RQ.:');
+    if (requestTreatment3Split[1]) {
+      const requestSplit = requestTreatment3Split[1].split('-')
+
+      if (requestSplit[0]) {
+        requestCode = requestSplit[0].trim();
       }
     }
 
@@ -60,6 +74,7 @@ exports.getDeliveryInfoFromRomaneio = romaneio => {
   } else {
     return {
       orderCode,
+      requestCode,
       fullAddress,
       customerCode,
       customerName,
@@ -71,10 +86,14 @@ exports.getDeliveryInfoFromRomaneio = romaneio => {
 exports.getDeliveriesFromData = txtContent => {
   let deliveryList = [];
 
-  const fullRomaneioSplit = txtContent.split('�����������������������������������������������������������������������������������������������������������������������������������������');
+  // const fullRomaneioSplit = txtContent.split('�����������������������������������������������������������������������������������������������������������������������������������������');
+
+  const replacedText = txtContent.replace(/VL ROMANEIO/g, 'VL PEDIDO')
+  const fullRomaneioSplit = replacedText.split('ROMANEIO:');
 
   fullRomaneioSplit.map((romaneio, index) => {
     const result = this.getDeliveryInfoFromRomaneio(romaneio);
+
     if (result) {
       deliveryList.push(result);
     }

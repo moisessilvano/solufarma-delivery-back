@@ -5,7 +5,7 @@ const Model = mongoose.model('Delivery');
 
 exports.get = async (limit, skip) => {
     const res = await Model.find({},
-        'orderCode deliveryDate fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
         .limit(limit)
         .skip(skip)
         .populate('deliveredUser', 'name username')
@@ -13,7 +13,7 @@ exports.get = async (limit, skip) => {
 }
 
 exports.getById = async (id) => {
-    const res = await Model.findById(id, 'orderCode deliveryDate fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+    const res = await Model.findById(id, 'orderCode requestCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
         .populate('deliveredUser', 'name username');
     return res;
 }
@@ -22,19 +22,38 @@ exports.getByOrder = async orderCode => {
     const res = await Model.findOne({
         orderCode
     },
-        'orderCode deliveryDate fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
         .populate('deliveredUser', 'name username');
     return res;
 }
 
-exports.getByDate = async date => {
-    const initialDate = new Date(date);
-    const finalDate = new Date(date)
-    finalDate.setDate(finalDate.getDate() + 1);
+exports.getByDate = async (date1, date2) => {
+    let initialDate, finalDate;
+
+    if (date1 && !date2) {
+        initialDate = new Date(date1);
+        finalDate = new Date(date1);
+        finalDate.setDate(finalDate.getDate() + 1);
+
+    }
+
+    if (date1 && date2) {
+        initialDate = new Date(date1);
+        finalDate = new Date(date2)
+        finalDate.setDate(finalDate.getDate() + 2);
+    }
+
 
     const res = await Model.find(
         { "deliveryDate": { "$gte": initialDate, "$lt": finalDate } },
-        'orderCode deliveryDate fullAddress customerCode customerName minTemperature maxTemperature minHumidity maxHumidity deliveredIn deliveredUser createAt updateAt')
+        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser receivedBy createAt updateAt')
+        .populate('deliveredUser', 'name username');
+    return res;
+}
+
+exports.getByParams = async params => {
+    const res = await Model.findOne(params,
+        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
         .populate('deliveredUser', 'name username');
     return res;
 }

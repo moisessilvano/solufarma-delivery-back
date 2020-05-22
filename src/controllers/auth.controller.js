@@ -7,13 +7,20 @@ const authService = require('../services/auth.service');
 
 exports.token = async (req, res, next) => {
     try {
+
         const { username, password } = req.body;
+
+        console.log(req.body)
+
         const user = await repository.auth(username, passwordService.encript(password));
-        if (!user) res.status(401).send();
+        if (!user) res.status(401).send({
+            message: 'Usuário ou senha inválido'
+        });
 
         const token = await authService.generateToken({
             _id: user._id,
             username: user.username,
+            name: user.name,
             type: user.type
         });
 

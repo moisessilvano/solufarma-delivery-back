@@ -8,36 +8,50 @@ const schema = new Schema({
         type: String,
         required: true
     },
+    requestCode: {
+        type: String,
+        required: true
+    },
     deliveryDate: {
         type: Date,
         required: true
-    },
-    customerCode: {
-        type: String
     },
     fullAddress: {
         type: String,
         required: true,
     },
+    customerCode: {
+        type: String
+    },
     customerName: {
         type: String,
         required: true,
     },
-    minTemperature: {
-        type: Number
+
+    departureDateTime: {
+        type: String,
     },
-    maxTemperature: {
-        type: Number
+    departureTemperature: {
+        type: String,
     },
-    minHumidity: {
-        type: Number
+
+    arrivalDateTime: {
+        type: String,
     },
-    maxHumidity: {
-        type: Number
+    arrivalTemperature: {
+        type: String,
     },
-    deliveredIn: {
-        type: Date,
+
+    receivedBy: {
+        type: String,
     },
+
+    status: {
+        type: String,
+        enum: ['canceled', 'pending', 'motoboy', 'delivered'],
+        default: 'pending'
+    },
+
     deliveredUser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
