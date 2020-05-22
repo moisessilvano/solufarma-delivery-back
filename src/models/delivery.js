@@ -56,6 +56,15 @@ const schema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+
+    amountReceivable: {
+        type: Number
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['money', 'card'],
+    },
+
     createAt: {
         type: Date,
         required: true,

@@ -3,7 +3,7 @@
 const axios = require('axios').default;
 const NodeCache = require("node-cache");
 
-const ttl = 60 * 30;
+const ttl = 60 * 60 * 1;
 
 const myCache = new NodeCache({ stdTTL: ttl });
 
@@ -21,6 +21,10 @@ exports.getInfo = async () => {
 
         if (climate && climate.data && climate.data.data) {
             temperature = climate.data.data.temperature;
+
+            if (temperature > 30) {
+                temperature = 30;
+            }
         } else {
             rej(null);
         }

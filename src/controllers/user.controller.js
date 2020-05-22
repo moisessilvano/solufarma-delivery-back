@@ -48,7 +48,9 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
     try {
-        const { id, password } = req.params;
+        const { id } = req.params;
+        const { password } = req.body;
+
         await repository.update(id, {
             ...req.body,
             password: passwordService.encript(password)

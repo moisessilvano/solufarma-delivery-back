@@ -204,7 +204,6 @@ exports.completeDelivery = async (req, res, next) => {
 
     try {
         const { id } = req.params;
-        const { receivedBy } = req.body;
 
         const delivery = await repository.getById(id);
 
@@ -221,7 +220,7 @@ exports.completeDelivery = async (req, res, next) => {
             arrivalDateTime: moment().toISOString(),
             arrivalTemperature: temperature,
             status: 'delivered',
-            receivedBy
+            ...req.body
         }
 
         await repository.update(id, newData);
