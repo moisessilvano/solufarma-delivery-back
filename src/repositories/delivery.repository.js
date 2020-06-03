@@ -5,7 +5,7 @@ const Model = mongoose.model('Delivery');
 
 exports.get = async (limit, skip) => {
     const res = await Model.find({},
-        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt amountReceivable paymentMethod')
+        'orderCode requestCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt amountReceivable paymentMethod')
         .limit(limit)
         .skip(skip)
         .populate('deliveredUser', 'name username')
@@ -43,10 +43,9 @@ exports.getByDate = async (date1, date2) => {
         finalDate.setDate(finalDate.getDate() + 2);
     }
 
-
     const res = await Model.find(
         { "deliveryDate": { "$gte": initialDate, "$lt": finalDate } },
-        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser receivedBy createAt updateAt amountReceivable paymentMethod')
+        'orderCode requestCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser receivedBy createAt updateAt amountReceivable paymentMethod')
         .populate('deliveredUser', 'name username');
     return res;
 }

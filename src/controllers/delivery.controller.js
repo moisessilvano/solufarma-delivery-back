@@ -61,7 +61,7 @@ exports.getByDate = async (req, res, next) => {
         var workbook = new excel.Workbook();
 
         // Add Worksheets to the workbook
-        var worksheet = workbook.addWorksheet('Plan 1');
+        var worksheet = workbook.addWorksheet('Relatório');
 
         const styleHeader = workbook.createStyle({
             font: {
@@ -136,7 +136,7 @@ exports.getByDate = async (req, res, next) => {
         worksheet.cell(1, 8).string('Temperatura de Entrega').style(styleHeader);
 
         deliveries.map((d, index) => {
-            worksheet.cell(index + 2, 1).string(d.orderCode).style(styleData);
+            worksheet.cell(index + 2, 1).string(d.requestCode).style(styleData);
             worksheet.cell(index + 2, 2).string(d.customerName).style(styleData);
 
             worksheet.cell(index + 2, 3).string(d.departureDateTime ? moment(d.departureDateTime).format('DD/MM/YYYY') : '').style(styleData);
