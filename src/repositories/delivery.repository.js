@@ -27,6 +27,33 @@ exports.getByOrder = async orderCode => {
     return res;
 }
 
+exports.getByMotoboy = async user => {
+    let initialDate = new Date();
+    initialDate.setHours(0, 0, 0, 0);
+    initialDate.setDate(initialDate.getDate() - 0);
+    let finalDate = new Date();
+    finalDate.setDate(finalDate.getDate() + 1);
+    finalDate.setHours(0, 0, 0, 0);
+
+
+    const res = await Model.find({
+        deliveredUser: user,
+        deliveryDate: { "$gte": initialDate.toISOString(), "$lt": finalDate.toISOString() }
+    },
+        'orderCode requestCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
+        .populate('deliveredUser', 'name username').sort('-status');
+    return res;
+}
+
+exports.getByRequestCode = async requestCode => {
+    const res = await Model.findOne({
+        requestCode
+    },
+        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
+        .populate('deliveredUser', 'name username').sort('-deliveryDate');
+    return res;
+}
+
 exports.getByDate = async (date1, date2) => {
     let initialDate, finalDate;
 

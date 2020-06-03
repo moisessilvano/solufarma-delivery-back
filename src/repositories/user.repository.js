@@ -16,6 +16,13 @@ exports.get = async () => {
     return res;
 }
 
+exports.getByType = async type => {
+    const res = await Model.find({
+        type
+    }, 'name username type createAt updateAt');
+    return res;
+}
+
 exports.getById = async (id) => {
     const res = await Model.findById(id, 'name username type createAt updateAt');
     return res;

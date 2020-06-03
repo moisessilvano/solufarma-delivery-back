@@ -5,8 +5,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     orderCode: {
-        type: String,
-        required: true
+        type: String
     },
     requestCode: {
         type: String,

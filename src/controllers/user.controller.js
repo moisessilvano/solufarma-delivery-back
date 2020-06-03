@@ -16,6 +16,20 @@ exports.get = async (req, res, next) => {
     }
 };
 
+exports.getByType = async (req, res, next) => {
+    try {
+        const { type } = req.params;
+        var data = await repository.getByType(type);
+        res.status(200).send(data);
+    } catch (e) {
+        res.status(500).send({
+            message: errorEnum.REQUEST_ERROR,
+            error: e
+        });
+    }
+};
+
+
 exports.getById = async (req, res, next) => {
     try {
         const { id } = req.params;

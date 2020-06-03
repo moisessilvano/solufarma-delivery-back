@@ -27,14 +27,25 @@ exports.get = async (req, res, next) => {
     }
 };
 
-
-
 exports.getByOrder = async (req, res, next) => {
     try {
         const { order } = req.params;
-        var data = await repository.getByOrder(order);
+        var data = await repository.getByRequestCode(order);
 
         data ? res.status(200).send(data) : res.status(400).send();
+    } catch (e) {
+        res.status(500).send({
+            message: errorEnum.REQUEST_ERROR,
+            error: e
+        });
+    }
+};
+
+exports.getByMotoboy = async (req, res, next) => {
+    try {
+        const { user } = req.params;
+        var data = await repository.getByMotoboy(user);
+        data ? res.status(200).send(data) : res.status(200).send([]);
     } catch (e) {
         res.status(500).send({
             message: errorEnum.REQUEST_ERROR,
@@ -135,7 +146,9 @@ exports.getByDate = async (req, res, next) => {
         worksheet.cell(1, 7).string('Horário de Entrega').style(styleHeader);
         worksheet.cell(1, 8).string('Temperatura de Entrega').style(styleHeader);
 
-        deliveries.map((d, index) => {
+        const newDeliveries = deliveries.filter(d => d.status != 'canceled');
+
+        newDeliveries.map((d, index) => {
             worksheet.cell(index + 2, 1).string(d.requestCode).style(styleData);
             worksheet.cell(index + 2, 2).string(d.customerName).style(styleData);
 
@@ -174,7 +187,20 @@ exports.getById = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        await repository.create(req.body);
+        const body = req.body;
+
+        const newBody = {
+            ...body,
+            deliveryDate: moment(body.deliveryDate).toISOString()
+        };
+
+        await repository.create({
+            deliveryDate: newBody.deliveryDate,
+            orderCode: newBody.orderCode,
+            requestCode: newBody.requestCode,
+            customerName: newBody.customerName,
+            fullAddress: newBody.fullAddress
+        });
         res.status(200).send();
     } catch (e) {
         res.status(500).send({
@@ -207,7 +233,7 @@ exports.completeDelivery = async (req, res, next) => {
 
         const delivery = await repository.getById(id);
 
-        if (delivery && delivery.deliveredUser) {
+        if (delivery && delivery.status == 'delivered') {
             return res.status(400).send({
                 message: 'Essa entrega já foi efetuada por ' + delivery.deliveredUser.name
             })
@@ -228,6 +254,7 @@ exports.completeDelivery = async (req, res, next) => {
         req.app.io.emit('deliveries', {
             _id: delivery._id,
             orderCode: delivery.orderCode,
+            requestCode: delivery.requestCode,
             customerName: delivery.customerName,
             fullAddress: delivery.fullAddress,
             ...newData,
@@ -251,7 +278,7 @@ exports.releaseDelivery = async (req, res, next) => {
 
     try {
         const { id } = req.params;
-        const { receivedBy } = req.body;
+        const { deliveredUser } = req.body;
 
         const delivery = await repository.getById(id);
 
@@ -266,18 +293,15 @@ exports.releaseDelivery = async (req, res, next) => {
         const newData = {
             departureDateTime: moment().toISOString(),
             departureTemperature: temperature,
-            status: 'motoboy'
+            status: 'motoboy',
+            deliveredUser
         }
 
         await repository.update(id, newData);
 
-        req.app.io.emit('deliveries', {
-            _id: delivery._id,
-            orderCode: delivery.orderCode,
-            customerName: delivery.customerName,
-            fullAddress: delivery.fullAddress,
-            ...newData
-        });
+        const deliveryData = await repository.getById(id);
+
+        req.app.io.emit('deliveries', deliveryData);
 
         res.status(200).send();
     } catch (e) {
