@@ -7,7 +7,7 @@ const authService = require('../services/auth.service');
 
 router.get('/', authService.authorize, controller.get);
 router.get('/getByOrder/:order', authService.authorize, controller.getByOrder);
-router.get('/getByDate', controller.getByDate);
+router.get('/getByParams', controller.getByParams);
 router.get('/getByMotoboy/:user', controller.getByMotoboy);
 router.get('/:id', authService.authorize, controller.getById);
 router.post('/', authService.authorize, controller.create);

@@ -54,11 +54,20 @@ exports.getByMotoboy = async (req, res, next) => {
     }
 };
 
-exports.getByDate = async (req, res, next) => {
+exports.getByParams = async (req, res, next) => {
     try {
-        const { initialDate, finalDate, exportFile } = req.query;
+        const { initialDate, finalDate, customerName, requestCode, exportFile } = req.query;
 
-        const deliveries = await repository.getByDate(initialDate, finalDate);
+        if (!initialDate && !customerName && !requestCode) {
+            if (!exportFile) {
+                res.status(400).send({
+                    message: 'Insira um valor no formulário de pesquisa!'
+                });
+                return;
+            }
+        }
+
+        const deliveries = await repository.getByParams(initialDate, finalDate, customerName, requestCode);
 
         if (!exportFile) {
             res.status(200).send(deliveries);

@@ -10,7 +10,7 @@ exports.token = async (req, res, next) => {
 
         const { username, password } = req.body;
 
-        const user = await repository.auth(username, passwordService.encript(password));
+        const user = await repository.auth(username.toLowerCase(), passwordService.encript(password));
         if (!user) res.status(401).send({
             message: 'Usuário ou senha inválido'
         });

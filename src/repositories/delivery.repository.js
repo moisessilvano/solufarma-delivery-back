@@ -54,7 +54,7 @@ exports.getByRequestCode = async requestCode => {
     return res;
 }
 
-exports.getByDate = async (date1, date2) => {
+exports.getByParams = async (date1, date2, customerName, requestCode) => {
     let initialDate, finalDate;
 
     if (date1 && !date2) {
@@ -70,19 +70,33 @@ exports.getByDate = async (date1, date2) => {
         finalDate.setDate(finalDate.getDate() + 2);
     }
 
+    let match = {};
+
+    if (initialDate) {
+        match.deliveryDate = { "$gte": initialDate, "$lt": finalDate };
+    }
+
+    if (customerName) {
+        match.customerName = { "$regex": customerName, "$options": "i" };
+    }
+
+    if (requestCode) {
+        match.requestCode = requestCode;
+    }
+
     const res = await Model.find(
-        { "deliveryDate": { "$gte": initialDate, "$lt": finalDate } },
+        match,
         'orderCode requestCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser receivedBy createAt updateAt amountReceivable paymentMethod')
         .populate('deliveredUser', 'name username');
     return res;
 }
 
-exports.getByParams = async params => {
-    const res = await Model.findOne(params,
-        'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
-        .populate('deliveredUser', 'name username');
-    return res;
-}
+// exports.getByParams = async params => {
+//     const res = await Model.findOne(params,
+//         'orderCode deliveryDate fullAddress customerCode customerName status departureDateTime departureTemperature arrivalDateTime arrivalTemperature status deliveredUser createAt updateAt')
+//         .populate('deliveredUser', 'name username');
+//     return res;
+// }
 
 exports.create = (data) => {
     var model = new Model(data);
